@@ -1,0 +1,76 @@
+dim bRet = ""
+dim arrRet = ""
+dim sRet = ""
+dim objExcelWorkBook = ""
+dim item = ""
+dim dTime = ""
+dim iRet = ""
+dim hWeb = ""
+
+hWeb = WebBrowser.Create("uibotbrowser","http://www.ccgp-hubei.gov.cn/notice/cggg/pzbgg/index_1.html",30000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"sBrowserPath":"","sStartArgs":""})
+#icon("@res:709rtm9b-jdnb-k800-15dr-uf4i69rv1bvl.png")
+Mouse.Action({"wnd":[{"cls":"Chrome_WidgetWin_0","title":"*","app":"uibotBrowser"},{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}],"html":{"tagName":"UL","attrMap":{"tag":"UL","parentid":"nav","ubtitle":"true"},"index":0}},"left","dbclick",10000,{"bContinueOnError":false,"iDelayAfter":1000,"iDelayBefore":2000,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+iRet = Dialog.MsgBox("本流程只支持查询本周公告，如需查询更长时间，请按取消按钮自己手动筛选","UiBot",5,"1",0)
+If iret=2
+exit()
+ 
+Else
+ 
+End If
+TracePrint(iret)
+objExcelWorkBook = Excel.OpenExcel("C:\\Users\\Administrator\\Desktop\\每日标讯.xlsx",true)
+#icon("@res:9te9n6h5-9vt0-sv22-tnqi-522opt3d6q4u.png")
+sRet = Text.Get({"wnd":[{"cls":"Chrome_WidgetWin_0","title":"*","app":"uibotBrowser"},{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}],"html":{"tagName":"DIV","attrMap":{"css-selector":"body>div>div>div>div>div","parentid":"main","tag":"DIV"},"index":2}},10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true})
+TracePrint(sRet)
+sRet1 = Regex.FindStr(sRet,"共1/(\\d+)页",1)
+TracePrint(sRet1)
+dTime = Time.Date()
+ttime = Time.Format(dTime,"yyyy-mm-dd")
+TracePrint(ttime)
+try 
+Excel.DeleteSheet(objExcelWorkBook,ttime,false)
+ catch 
+ end try
+Excel.CreateSheet(objExcelWorkBook,ttime,"after",true)
+For i = 1 To sRet1 step 1 
+ 
+try 
+ #icon("@res:rpo9hue7-23ug-dm1n-fbv8-2ik06gmdgtqt.png")
+Mouse.Action({"wnd":[{"cls":"Chrome_WidgetWin_0","title":"*","app":"uibotBrowser"},{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}],"html":{"tagName":"A","attrMap":{"aaname":""&i,"parentid":"main","tag":"A"},"index":0}},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+#icon("@res:sv6gvl3q-kc85-aq62-bdhv-q8in5craeaqj.png")
+sRet = Text.Get({"wnd":[{"cls":"Chrome_WidgetWin_0","title":"*","app":"uibotBrowser"},{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}],"html":{"tagName":"DIV","attrMap":{"css-selector":"body>div>div>div>div>div>div","parentid":"main","tag":"DIV"},"index":0}},10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true})
+arrRet = Split(sRet,"[")
+item = Shift(arrRet)
+For Each value1 In arrRet
+ 
+bRet = Regex.Test(value1,ttime)
+If bRet
+value2 = RTrim(value1,ttime)
+arrRet1 = Split(value2,"]")
+TracePrint(arrret1)
+ 
+#icon("@res:9u231cmq-jp5m-vc37-o6pq-44rfpm33umaf.png")
+Mouse.Action({"wnd":[{"cls":"Chrome_WidgetWin_0","title":"*","app":"uibotBrowser"},{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}],"html":{"tagName":"A","attrMap":{"aaname":"*"&(arrRet1[1]),"parentid":"main","tag":"A"},"index":0}},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+sRet = WebBrowser.GetURL(hWeb,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+TracePrint(sRet)
+#icon("@res:uvbj9pag-tumk-cqov-522s-546ciir6dtaq.png")
+Mouse.Action({"wnd":[{"cls":"Chrome_WidgetWin_0","title":"*","app":"uibotBrowser"},{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}],"html":{"tagName":"svg","attrMap":{"tag":"svg","parentid":"1","ubtitle":"true"},"index":0}},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+arrRet2 = push(arrRet1,sRet)
+Excel.InsertRow(objExcelWorkBook,ttime,"A1",arrRet2,false)
+Else
+ 
+Break
+End If
+TracePrint(bRet)
+Next
+Break
+catch 
+ Break
+end try
+Next
+Keyboard.Press("F4", "press", ["Alt"],{"iDelayAfter":300,"iDelayBefore":200,"sSimulate":"simulate"})
+Excel.Save(objExcelWorkBook)
+Excel.CloseExcel(objExcelWorkBook,true)
+#icon("@res:lftb3rfn-e7p0-sqvi-39iv-ejnlp4ge47np.png")
+
+
